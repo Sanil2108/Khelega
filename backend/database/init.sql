@@ -65,3 +65,9 @@ CREATE TABLE IF NOT EXISTS game_master_platform_mapping (
     platform_id INT NOT NULL,
     game_master_id INT NOT NULL
 );
+
+CREATE TABLE IF NOT EXISTS forgot_password_token (
+    forgot_password_token_id SERIAL PRIMARY KEY,
+    user_id INT NOT NULL,
+    token TEXT NOT NULL
+);

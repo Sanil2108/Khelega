@@ -17,3 +17,5 @@ DROP TABLE IF EXISTS platform_master;
 DROP TABLE IF EXISTS skill_master;
 
 DROP TABLE IF EXISTS game_master_platform_mapping;
+
+DROP TABLE IF EXISTS forgot_password_token;
