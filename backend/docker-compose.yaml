@@ -1,0 +1,14 @@
+version: "3.3"
+services:
+  database:
+    image: postgres:13
+    env_file: ./database/.env
+  
+  database-config:
+    image: postgres:13
+    env_file: ./database/.env
+    volumes:
+      - "./database:/database"
+    depends_on:
+      - database
+    command: /database/init.sh
