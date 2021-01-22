@@ -3,6 +3,8 @@ services:
   database:
     image: postgres:13
     env_file: ./database/.env
+    ports:
+      - "5433:5432"
   
   database-config:
     image: postgres:13
@@ -12,3 +14,12 @@ services:
     depends_on:
       - database
     command: /database/init.sh
+
+  hasura:
+    image: hasura/graphql-engine
+    env_file: ./hasura/.env
+    ports:
+      - "8080:8080"
+    depends_on:
+      - "database"
+      - "database-config"
