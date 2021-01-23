@@ -40,7 +40,7 @@ METHOD: POST
 
 Request Headers: 
 {
-    Authorization: atob(EMAIL:PASSWORD)
+    Authorization: ${atob(EMAIL:PASSWORD)}
 }
 
 Response Body:
@@ -70,7 +70,7 @@ Response Body:
 Possible status: 200, 400, 404
 ```
 
-### isAuthentic
+### Is Authentic
 
 ```
 URL: ${USERS_BASE_URL}/isAuthentic
@@ -82,20 +82,6 @@ Request Headers:
 }
 
 Possible status: 200, 401
-```
-
-### Forgot Password 
-
-```
-URL: ${USERS_BASE_URL}/forgotPassword
-METHOD: POST
-
-Request: 
-{
-    email: 'sanilkhurana7@gmail.com'
-}
-
-Possible status: 200, 400
 ```
 
 ### Change Password
@@ -112,6 +98,27 @@ Request:
 
 Possible status: 200, 400
 ```
+
+### Follow
+
+```
+URL: ${USERS_BASE_URL}/follow
+METHOD: POST
+
+Request Headers: 
+{
+    Authorization: ${atob(EMAIL:PASSWORD)}
+}
+
+Request: 
+{
+    email
+}
+
+Possible status: 200, 400
+```
+
+
 
 ## Games
 
