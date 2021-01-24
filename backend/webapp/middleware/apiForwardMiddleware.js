@@ -1,17 +1,18 @@
 const apiForwardMiddleware = (apiFunction) => {
-    return (req, res, next) => {
-        const body = req.body;
-        const headers = req.headers;
+  return async (req, res, next) => {
+    const body = req.body;
+    const headers = req.headers;
 
-        const response = apiFunction({
-            headers,
-            body
-        });
+    const response = await apiFunction({
+      ...req,
+      headers,
+      body,
+    }, res);
 
-        res.json(response);
+    res.json(response);
 
-        next();
-    }
-}
+    next();
+  };
+};
 
-module.exports = {apiForwardMiddleware};
+module.exports = { apiForwardMiddleware };

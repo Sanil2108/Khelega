@@ -1,21 +1,70 @@
 const {
-    registerUserApi
-} = require('./api');
+  registerUserApi,
+  loginUserApi,
+  forgotPasswordApi,
+  isAuthenticApi,
+  changePasswordApi,
+  followApi,
+} = require("./api");
 
 const {
-    registerUserSchema
-} = require('./schema');
+  registerUserSchema,
+  loginUserSchema,
+  forgotPasswordSchema,
+  isAuthenticSchema,
+  changePasswordSchema,
+  followSchema,
+} = require("./schema");
 
 const {
-    schemaValidationMiddleware
-} = require('../../middleware/validationMiddlewares');
+  schemaValidationMiddleware,
+  headerValidationMiddleware,
+  basicAuthorizationMiddleware,
+  jwtAuthorizationMiddleware,
+} = require("../../middleware/validationMiddlewares");
 
 const {
-    apiForwardMiddleware
-} = require('../../middleware/apiForwardMiddleware');
+  apiForwardMiddleware,
+} = require("../../middleware/apiForwardMiddleware");
 
-const userRouter = require('express').Router();
+const userRouter = require("express").Router();
 
-userRouter.post('/register', schemaValidationMiddleware(registerUserSchema), apiForwardMiddleware(registerUserApi));
+userRouter.post(
+  "/register",
+  schemaValidationMiddleware(registerUserSchema),
+  apiForwardMiddleware(registerUserApi)
+);
+
+userRouter.post(
+  "/login",
+  headerValidationMiddleware(loginUserSchema),
+  basicAuthorizationMiddleware,
+  apiForwardMiddleware(loginUserApi)
+);
+
+userRouter.post(
+  "/forgotPassword",
+  schemaValidationMiddleware(forgotPasswordSchema),
+  apiForwardMiddleware(forgotPasswordApi)
+);
+
+userRouter.post(
+  "/isAuthentic",
+  headerValidationMiddleware(isAuthenticSchema),
+  jwtAuthorizationMiddleware,
+  apiForwardMiddleware(isAuthenticApi)
+);
+
+userRouter.post(
+  "/changePassword",
+  schemaValidationMiddleware(changePasswordSchema),
+  apiForwardMiddleware(changePasswordApi)
+);
+
+userRouter.post(
+  "/follow",
+  schemaValidationMiddleware(followSchema),
+  apiForwardMiddleware(followApi)
+);
 
 module.exports = userRouter;
