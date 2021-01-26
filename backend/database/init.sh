@@ -16,3 +16,6 @@ psql -h database -a -U sanil -d khelega -a -f /database/resetdb.sql
 psql -h database -a -U sanil -d khelega -a -f /database/init.sql
 psql -h database -a -U sanil -d khelega -a -f /database/populate.sql
 echo "---------------- Database Configuration Complete ---------------- "
+
+psql -h database -a -U sanil -d khelega -a -c "SELECT set_config('log_statement', 'all', true);"
+

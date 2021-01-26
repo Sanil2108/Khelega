@@ -6,21 +6,36 @@ const {
   verifyJWT
 } = require("../../utils/authenticationUtils");
 
-const { getRegisterUserQuery, getPasswordHashQuery } = require("./sqlQueries");
+const {
+  getRandomUUID,
+  sendEmail
+} = require("../../utils/utils");
 
-const registerUser = async ({ body, headers }) => {
-  const query = getRegisterUserQuery();
+const {
+  addUser,
+  getUserIdFromEmail,
+  deleteOldTokensForUser,
+  addResetPasswordToken
+} = require("./dbOperations");
 
+const registerUser = async ({ body, headers }, res) => {
   const hashedPassword = await hashPassword(body.password);
 
-  const result = await postgresDriver.query(query, [
-    body.username,
-    body.email,
+  const {successful} = await addUser({
     hashedPassword,
-    body.description ? body.description : null,
-  ]);
+    email: body.email,
+    username: body.username,
+    description: body.description
+  });
 
-  return result;
+  if (!successful) {
+    res.status(500).send('Something went wrong.');
+  }
+
+  return {
+    successful: true,
+    data: {}
+  };
 };
 
 const loginUser = async ({ user, body, headers }, res) => {
@@ -28,19 +43,51 @@ const loginUser = async ({ user, body, headers }, res) => {
     email: user.email
   });
   return {
-    jwt
+    successful: true,
+    data: {
+      jwt
+    }
   }
 };
 
-const forgotPassword = async ({ body, headers }) => {};
+const forgotPassword = async ({ body, headers }) => {
+  const {email} = body;
+  
+  // TODO: This all needs to be done in a transaction
+  const {successful: userIdRetrieved, data} = await getUserIdFromEmail({email});
+  if (!userIdRetrieved) {
+    res.status(404).send('Failed to retrieve user for this email');
+  }
+  const {user_id: userId} = data;
+
+  const {successful: successfullyDeleteOldTokensForUser} = await deleteOldTokensForUser({userId});
+  if (!successfullyDeleteOldTokensForUser) {
+    res.status(500).send('Failed to delete old tokens for the user');
+  }
+  
+  const {successful: successfullyAddedTokenForUser} = await addResetPasswordToken({userId});
+  if (!successfullyAddedTokenForUser) {
+    res.status(500).send('Failed to add reset password token');
+  }
+
+  // TODO:
+  sendEmail({
+    receiver: email,
+    subject: 'Hello',
+    message: 'hello'
+  });
+
+  return {
+    successful: true,
+  }
+};
 
 const isAuthentic = async ({ user, body, headers }, res) => {
   if (user) {
-    res.json({
+    return {
       successful: true,
-      user
-    });
-    return;
+      data: {user}
+    }
   }
   else {
     res.status(401).send("Authentication Failed.");

@@ -16,13 +16,18 @@ class PostgresDriver {
 
   async query(queryString, variables) {
     return await new Promise((resolve, reject) => {
-      this.client.query(queryString, variables, (error, result) => {
-        if (error) {
-          reject(error);
-        } else {
-          resolve(result);
-        }
-      });
+      try {
+        this.client.query(queryString, variables, (error, result) => {
+          if (error) {
+            reject(error);
+          } else {
+            resolve(result);
+          }
+        });
+      }
+      catch (exception) {
+        console.error(exception)
+      }
     });
   }
 

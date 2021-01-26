@@ -4,6 +4,7 @@ require("dotenv").config({ path: path.resolve(process.cwd(), ".env.staging") });
 const helmet = require("helmet");
 const cors = require("cors");
 const bodyParser = require("body-parser");
+const { URLS } = require("./constants");
 
 (async () => {
   const app = require("express")();
@@ -17,7 +18,7 @@ const bodyParser = require("body-parser");
 
   const userRouter = require("./routes/users/routes");
 
-  app.use("/users", userRouter);
+  app.use(URLS.ROUTES.USER, userRouter);
 
   const PORT = process.env.PORT;
   app.listen(PORT, () => console.log(`Listening on PORT ${PORT}`));

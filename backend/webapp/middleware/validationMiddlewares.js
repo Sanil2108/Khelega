@@ -44,7 +44,8 @@ const basicAuthorizationMiddleware = async (req, res, next) => {
   }
 
   try {
-    const [email, password] = atob(req.headers.authorization).split(":");
+    const base64Token = req.headers.authorization.split(' ')[1];
+    const [email, password] = atob(base64Token).split(":");
     req.user = {
       email,
     };
@@ -53,7 +54,7 @@ const basicAuthorizationMiddleware = async (req, res, next) => {
 
     const { rows } = await postgresDriver.query(query, [email]);
     if (rows.length === 0) {
-      res.status(400).send("User does not exist");
+      res.status(404).send("User does not exist");
       return;
     }
     
