@@ -3,12 +3,34 @@ const {
   getRegisterUserQuery,
   getDeleteForgotPasswordTokensForUserQuery,
   getUserIdFromEmailQuery,
+  getUserIdFromUsername,
   getAddResetPasswordTokenQuery
 } = require('./sqlQueries');
 const {
   getRandomUUID
 } = require('../../utils/utils');
 
+const doesEmailExist = async ({email}) => {
+  const userIdQuery = getUserIdFromEmailQuery();
+  const {rows} = await postgresDriver.query(userIdQuery, [email]);
+  return {
+    successful: true,
+    data: {
+      exists: rows.length > 0
+    }
+  }
+}
+
+const doesUsernameExist = async ({username}) => {
+  const userIdQuery = getUserIdFromUsername();
+  const {rows} = await postgresDriver.query(userIdQuery, [username]);
+  return {
+    successful: true,
+    data: {
+      exists: rows.length > 0
+    }
+  }
+}
 
 const deleteOldTokensForUser = async ({user_id}) => {
   const query = getDeleteForgotPasswordTokensForUserQuery();
@@ -63,4 +85,6 @@ module.exports = {
   deleteOldTokensForUser,
   getUserIdFromEmail,
   addResetPasswordToken,
+  doesEmailExist,
+  doesUsernameExist,
 }

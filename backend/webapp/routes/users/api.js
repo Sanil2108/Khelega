@@ -15,10 +15,34 @@ const {
   addUser,
   getUserIdFromEmail,
   deleteOldTokensForUser,
-  addResetPasswordToken
+  addResetPasswordToken,
+  doesUsernameExist,
+  doesEmailExist
 } = require("./dbOperations");
 
 const registerUser = async ({ body, headers }, res) => {
+  const doesUsernameExistResponse = await doesUsernameExist({username: body.username});
+  if (!doesUsernameExistResponse.successful) {
+    res.status(500).send('Something went wrong');
+    return;
+  }
+
+  if (doesUsernameExistResponse.data.exists) {
+    res.status(400).send('A user with this username already exists');
+    return;
+  }
+
+  const doesEmailExistResponse = await doesEmailExist({email: body.email});
+  if (!doesEmailExistResponse.successful) {
+    res.status(500).send('Something went wrong');
+    return;
+  }
+
+  if (doesEmailExistResponse.data.exists) {
+    res.status(400).send('A user with this email already exists');
+    return;
+  }
+
   const hashedPassword = await hashPassword(body.password);
 
   const {successful} = await addUser({

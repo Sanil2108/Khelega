@@ -18,7 +18,7 @@ const { URLS } = require("./constants");
 
   const userRouter = require("./routes/users/routes");
 
-  app.use(URLS.ROUTES.USER, userRouter);
+  app.use(URLS.ROUTES.USERS.BASE_URL, userRouter);
 
   const PORT = process.env.PORT;
   app.listen(PORT, () => console.log(`Listening on PORT ${PORT}`));

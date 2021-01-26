@@ -1,8 +1,8 @@
 -- Creating tables
 CREATE TABLE IF NOT EXISTS user_master (
     user_id SERIAL PRIMARY KEY,
-    username TEXT NOT NULL,
-    email TEXT NOT NULL,
+    username TEXT NOT NULL UNIQUE,
+    email TEXT NOT NULL UNIQUE,
     password_hash TEXT NOT NULL,
     description TEXT
 );

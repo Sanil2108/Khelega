@@ -9,7 +9,9 @@ const apiForwardMiddleware = (apiFunction) => {
       body,
     }, res);
 
-    res.json(response.data);
+    if (response) {
+      res.json(response.data);
+    }
 
     next();
   };

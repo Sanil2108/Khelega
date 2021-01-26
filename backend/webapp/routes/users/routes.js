@@ -26,43 +26,44 @@ const {
 const {
   apiForwardMiddleware,
 } = require("../../middleware/apiForwardMiddleware");
+const { URLS } = require("../../constants");
 
 const userRouter = require("express").Router();
 
 userRouter.post(
-  "/register",
+  URLS.ROUTES.USERS.REGISTER,
   schemaValidationMiddleware(registerUserSchema),
   apiForwardMiddleware(registerUserApi)
 );
 
 userRouter.post(
-  "/login",
+  URLS.ROUTES.USERS.LOGIN,
   headerValidationMiddleware(loginUserSchema),
   basicAuthorizationMiddleware,
   apiForwardMiddleware(loginUserApi)
 );
 
 userRouter.post(
-  "/forgotPassword",
+  URLS.ROUTES.USERS.FORGOT_PASSWORD,
   schemaValidationMiddleware(forgotPasswordSchema),
   apiForwardMiddleware(forgotPasswordApi)
 );
 
 userRouter.post(
-  "/isAuthentic",
+  URLS.ROUTES.USERS.IS_AUTHENTIC,
   headerValidationMiddleware(isAuthenticSchema),
   jwtAuthorizationMiddleware,
   apiForwardMiddleware(isAuthenticApi)
 );
 
 userRouter.post(
-  "/changePassword",
+  URLS.ROUTES.USERS.CHANGE_PASSWORD,
   schemaValidationMiddleware(changePasswordSchema),
   apiForwardMiddleware(changePasswordApi)
 );
 
 userRouter.post(
-  "/follow",
+  URLS.ROUTES.USERS.FOLLOW,
   schemaValidationMiddleware(followSchema),
   apiForwardMiddleware(followApi)
 );

@@ -5,22 +5,72 @@ const { URLS } = require("../constants");
 
 chai.use(chaiHttp);
 
+before((done) => {
+  require('../app');
+  setTimeout(done, 3000)
+})
+
 describe("Users test", () => {
   describe("Registering a user", () => {
-    it('Should return 404 when trying to login a user', () => {});
-
-    it('Should create a user', async () => {
-      await new Promise(r => setTimeout(r, 3000))
-
-      const response = await chai.request('http://localhost:3000/').post('users/register').send({
-        username: "sanil21",
+    it('Should return 400 when trying to register without an email', async () => {
+      const response = await chai.request(URLS.BASE_URL).post(`${URLS.ROUTES.USERS.BASE_URL}${URLS.ROUTES.USERS.REGISTER}`).send({
+        username: "sanil2",
         password: "raymon11",
-        email: "sanilkhurana7@gmail.com",
       });
-      assert.strictEqual(response.statusCode, 200);
+      assert.strictEqual(response.statusCode, 400, `Register did not give a 400 response code when trying to register without an email address.`);
     });
 
-    it('Should not return 404 when creating a user and logging in', () => {})
+    it('Should return 400 when trying to register with an invalid email', async () => {
+      const response = await chai.request(URLS.BASE_URL).post(`${URLS.ROUTES.USERS.BASE_URL}${URLS.ROUTES.USERS.REGISTER}`).send({
+        username: "sanil2",
+        password: "raymon11",
+        email: "sanilkhurana8@gmail",
+      });
+      assert.strictEqual(response.statusCode, 400, `Register did not give a 400 response code when trying to register with an invalid email address.`);
+    });
+
+    it('Should return 400 when trying to register without a username', async () => {
+      const response = await chai.request(URLS.BASE_URL).post(`${URLS.ROUTES.USERS.BASE_URL}${URLS.ROUTES.USERS.REGISTER}`).send({
+        password: "raymon11",
+        email: "sanilkhurana8@gmail.com",
+      });
+      assert.strictEqual(response.statusCode, 400, `Register did not give a 400 response code when trying to register without a username.`);
+    });
+
+    it('Should return 400 when trying to register without a password', async () => {
+      const response = await chai.request(URLS.BASE_URL).post(`${URLS.ROUTES.USERS.BASE_URL}${URLS.ROUTES.USERS.REGISTER}`).send({
+        username: "sanil2",
+        email: "sanilkhurana8@gmail.com",
+      });
+      assert.strictEqual(response.statusCode, 400, `Register did not give a 400 response code when trying to register without a password.`);
+    });
+
+    it('Should create a user', async () => {
+      const response = await chai.request(URLS.BASE_URL).post(`${URLS.ROUTES.USERS.BASE_URL}${URLS.ROUTES.USERS.REGISTER}`).send({
+        username: "sanil2",
+        password: "raymon11",
+        email: "sanilkhurana8@gmail.com",
+      });
+      assert.strictEqual(response.statusCode, 200, `Register did not give a 200 response code.`);
+    });
+
+    it('Should return 400 when trying to register with an email that already exists', async () => {
+      const response = await chai.request(URLS.BASE_URL).post(`${URLS.ROUTES.USERS.BASE_URL}${URLS.ROUTES.USERS.REGISTER}`).send({
+        username: "sanil2",
+        password: "raymon11",
+        email: "sanilkhurana8@gmail.com",
+      });
+      assert.strictEqual(response.statusCode, 400, `Register did not give a 400 response code when trying to register without an email address.`);
+    });
+
+    it('Should return 400 when trying to register with a username that already exists', async () => {
+      const response = await chai.request(URLS.BASE_URL).post(`${URLS.ROUTES.USERS.BASE_URL}${URLS.ROUTES.USERS.REGISTER}`).send({
+        username: "sanil2",
+        password: "raymon11",
+        email: "sanilkhurana8@gmail.com",
+      });
+      assert.strictEqual(response.statusCode, 400, `Register did not give a 400 response code when trying to register without an email address.`);
+    });
   });
 
   describe("Logging in a user", () => {
