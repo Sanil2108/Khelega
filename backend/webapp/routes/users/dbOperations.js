@@ -4,7 +4,9 @@ const {
   getDeleteForgotPasswordTokensForUserQuery,
   getUserIdFromEmailQuery,
   getUserIdFromUsername,
-  getAddResetPasswordTokenQuery
+  getAddResetPasswordTokenQuery,
+  getChangePasswordWithUserIdQuery,
+  getUserIdFromForgotPasswordTokenQuery
 } = require('./sqlQueries');
 const {
   getRandomUUID
@@ -56,12 +58,41 @@ const getUserIdFromEmail = async ({email}) => {
   };
 }
 
-const addResetPasswordToken = async ({user_id}) => {
+const addResetPasswordToken = async ({userId}) => {
   const forgotPasswordQuery = getAddResetPasswordTokenQuery();
-  const {rowCount} = await postgresDriver.query(forgotPasswordQuery, [user_id, getRandomUUID()]);
+
+  const token = getRandomUUID();
+
+  const {rowCount} = await postgresDriver.query(forgotPasswordQuery, [userId, token]);
 
   return {
     successful: rowCount !== 0,
+    data: {
+      token
+    }
+  }
+}
+
+const getUserIdFromForgotPasswordToken = async ({token}) => {
+  const query = getUserIdFromForgotPasswordTokenQuery();
+
+  const {rowCount, rows} = await postgresDriver.query(query, [token]);
+
+  return {
+    successful: rowCount > 0,
+    data: {
+      userId: rows && rows.length > 0 ? rows[0].user_id : null,
+    }
+  }
+}
+
+const changePasswordWithUserId = async ({password, userId}) => {
+  const changePasswordQuery = getChangePasswordWithUserIdQuery();
+
+  const {rowCount} = await postgresDriver.query(changePasswordQuery, [password, userId]);
+
+  return {
+    successful: rowCount > 0
   }
 }
 
@@ -87,4 +118,6 @@ module.exports = {
   addResetPasswordToken,
   doesEmailExist,
   doesUsernameExist,
+  getUserIdFromForgotPasswordToken,
+  changePasswordWithUserId,
 }

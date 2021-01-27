@@ -22,11 +22,21 @@ const getUserIdFromUsername = () => {
   return `SELECT user_id FROM user_master WHERE username = $1`;
 }
 
+const getUserIdFromForgotPasswordTokenQuery = () => {
+  return `SELECT user_id FROM forgot_password_token WHERE token = $1 AND user_id IS NOT NULL`;
+}
+
+const getChangePasswordWithUserIdQuery = () => {
+  return `UPDATE user_master SET password_hash = $1 WHERE user_id = $2`;
+}
+
 module.exports = {
   getRegisterUserQuery,
   getPasswordHashQuery,
   getUserIdFromEmailQuery,
   getAddResetPasswordTokenQuery,
   getDeleteForgotPasswordTokensForUserQuery,
-  getUserIdFromUsername
+  getUserIdFromUsername,
+  getUserIdFromForgotPasswordTokenQuery,
+  getChangePasswordWithUserIdQuery
 };

@@ -17,7 +17,9 @@ const {
   deleteOldTokensForUser,
   addResetPasswordToken,
   doesUsernameExist,
-  doesEmailExist
+  doesEmailExist,
+  getUserIdFromForgotPasswordToken,
+  changePasswordWithUserId
 } = require("./dbOperations");
 
 const registerUser = async ({ body, headers }, res) => {
@@ -74,35 +76,41 @@ const loginUser = async ({ user, body, headers }, res) => {
   }
 };
 
-const forgotPassword = async ({ body, headers }) => {
+const forgotPassword = async ({ body, headers }, res) => {
   const {email} = body;
   
   // TODO: This all needs to be done in a transaction
   const {successful: userIdRetrieved, data} = await getUserIdFromEmail({email});
   if (!userIdRetrieved) {
     res.status(404).send('Failed to retrieve user for this email');
+    return;
   }
   const {user_id: userId} = data;
 
   const {successful: successfullyDeleteOldTokensForUser} = await deleteOldTokensForUser({userId});
   if (!successfullyDeleteOldTokensForUser) {
     res.status(500).send('Failed to delete old tokens for the user');
+    return;
   }
   
-  const {successful: successfullyAddedTokenForUser} = await addResetPasswordToken({userId});
+  const {successful: successfullyAddedTokenForUser, data: resetPasswordTokenData} = await addResetPasswordToken({userId});
   if (!successfullyAddedTokenForUser) {
     res.status(500).send('Failed to add reset password token');
+    return;
   }
 
   // TODO:
-  sendEmail({
-    receiver: email,
-    subject: 'Hello',
-    message: 'hello'
-  });
+  // sendEmail({
+  //   receiver: email,
+  //   subject: 'Hello',
+  //   message: 'hello'
+  // });
 
   return {
     successful: true,
+    data: {
+      token: resetPasswordTokenData.token
+    }
   }
 };
 
@@ -118,7 +126,29 @@ const isAuthentic = async ({ user, body, headers }, res) => {
   }
 };
 
-const changePassword = async ({ body, headers }) => {};
+const changePassword = async({ body, headers }, res) => {
+  const {token, password} = body;
+
+  const {data, successful: successfullyRetrievedUserId} = await getUserIdFromForgotPasswordToken({token});
+  if (!successfullyRetrievedUserId) {
+    res.status(400).send('Incorrect token supplied');
+    return;
+  }
+
+  const hashedPassword = await hashPassword(password);
+
+  const {successful: successfullyChangedPasswords} = await changePasswordWithUserId({password: hashedPassword, userId: data.userId});
+  if (!successfullyChangedPasswords) {
+    res.status(500).send('Could not change your password');
+    return;
+  }
+
+  const {successful} = await deleteOldTokensForUser({user_id: data.userId});
+
+  return {
+    successful
+  }
+};
 
 const follow = async ({ body, headers }) => {};
 
