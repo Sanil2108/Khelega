@@ -122,4 +122,84 @@ Possible status: 200, 400
 
 ## Games
 
+`GAMES_BASE_URL: ${BASE_URL}/games/`
+
+### Host Game
+```
+URL: ${GAMES_BASE_URL}/host
+METHOD: POST
+
+Request Headers: 
+{
+    Authorization: Token ${jwt}
+}
+
+Request Body:
+{
+    gameMasterId: 1,
+    skillMasterId: 2,
+    totalPeopleRequired: 1,
+    frequencyOfPlay: '',
+    lookingFor: '',
+    description: ''
+}
+
+Response Body:
+{
+    gameId
+}
+
+Possible status: 201, 400, 401
+```
+
+### Join Game
+
+```
+URL: ${GAMES_BASE_URL}/join
+METHOD: POST
+
+Request Headers: 
+{
+    Authorization: Token ${jwt}
+}
+
+Request Body:
+{
+    gameId: 1,
+    username: 'sanil21'
+}
+
+Response Body:
+{
+    
+}
+
+Possible status: 200, 400, 401, 403
+```
+
+### Delete Game
+
+```
+URL: ${GAMES_BASE_URL}/delete
+METHOD: POST
+
+Request Headers: 
+{
+    Authorization: Token ${jwt}
+}
+
+Request Body:
+{
+    gameId
+}
+
+Response Body:
+{
+    gameId
+}
+
+Possible status: 200, 400, 401, 403
+```
+
+### Update Game
 
