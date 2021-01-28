@@ -17,8 +17,10 @@ const { URLS } = require("./constants");
   await postgresDriver.initialise();
 
   const userRouter = require("./routes/users/routes");
+  const gamesRouter = require("./routes/games/routes");
 
   app.use(URLS.ROUTES.USERS.BASE_URL, userRouter);
+  app.use(URLS.ROUTES.GAMES.BASE_URL, gamesRouter);
 
   const PORT = process.env.PORT;
   app.listen(PORT, () => console.log(`Listening on PORT ${PORT}`));

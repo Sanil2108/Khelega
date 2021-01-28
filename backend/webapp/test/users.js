@@ -74,6 +74,44 @@ describe("Users test", () => {
   });
 
   describe("Logging in a user", () => {
+    it('Should return 404 when trying to login a user that does not exist', async () => {
+
+    });
+
+    it('Should return 200 after registering a user and logging him/her', async () => {
+
+    });
+
+    it('Should return a JWT after logging in a valid user', async () => {
+
+    });
+
+    it('Should return 401 if trying to login without an authorization header', async () => {
+
+    });
+
+    it('Should return 400 when trying to login with a malformed authorization header', async () => {
+
+    });
+
+    it('Should return 400 when trying to login with incorrect password', async () => {
+
+    });
+  });
+
+  describe("Forgot Password", () => {
+
+  });
+
+  describe("Is Authentic", () => {
+
+  });
+
+  describe("Change Password", () => {
+
+  });
+
+  describe("Follow", () => {
 
   })
 });

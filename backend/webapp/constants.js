@@ -10,8 +10,13 @@ const URLS = {
       IS_AUTHENTIC: '/isAuthentic',
       CHANGE_PASSWORD: '/changePassword',
       FOLLOW: '/follow'
+    },
+    GAMES: {
+      BASE_URL: '/games',
+      HOST_GAME: '/host',
+      JOIN_GAME: '/join',
+      DELETE_GAME: '/delete'
     }
-
   }
 }
 
