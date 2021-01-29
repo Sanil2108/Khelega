@@ -28,7 +28,7 @@ CREATE TABLE IF NOT EXISTS hosting (
 CREATE TABLE IF NOT EXISTS game (
     game_id SERIAL PRIMARY KEY,
     game_master_id INT NOT NULL,
-    skill_master_id INT NOT NULL,
+    skill_master_id INT,
     total_people_required INT,
     frequency_of_play TEXT,
     looking_for TEXT,
@@ -37,10 +37,10 @@ CREATE TABLE IF NOT EXISTS game (
 
 CREATE TABLE IF NOT EXISTS game_master (
     game_master_id SERIAL PRIMARY KEY,
-    game_name TEXT NOT NULL,
-    icon_url TEXT NOT NULL,
-    genre TEXT NOT NULL,
-    is_free BOOLEAN NOT NULL
+    game_name TEXT NOT NULL UNIQUE,
+    icon_url TEXT,
+    genre TEXT,
+    is_free BOOLEAN
 );
 
 CREATE TABLE IF NOT EXISTS game_platform_mapping (

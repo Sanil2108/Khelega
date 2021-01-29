@@ -178,6 +178,7 @@ Possible status: 200, 400, 401, 403
 ```
 
 ### Delete Game
+Only allow the user to delete the games he has hosted
 
 ```
 URL: ${GAMES_BASE_URL}/delete
@@ -202,4 +203,27 @@ Possible status: 200, 400, 401, 403
 ```
 
 ### Update Game
+Only allow the user to update the games he has hosted
 
+```
+URL: ${GAMES_BASE_URL}/update
+METHOD: POST
+
+Request Headers: 
+{
+    Authorization: Token ${jwt}
+}
+
+Request Body:
+{
+    gameId,
+    updatedGameData
+}
+
+Response Body:
+{
+    gameId
+}
+
+Possible status: 200, 400, 401, 403
+```

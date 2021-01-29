@@ -1,4 +1,8 @@
-const {} = require("./api");
+const {
+  hostGameApi,
+  deleteGameApi,
+  joinGameApi,
+} = require("./api");
 
 const {
   hostGameSchema,
@@ -11,7 +15,6 @@ const { isAuthenticSchema } = require("../users/schema");
 const {
   schemaValidationMiddleware,
   headerValidationMiddleware,
-  basicAuthorizationMiddleware,
   jwtAuthorizationMiddleware,
 } = require("../../middleware/validationMiddlewares");
 
@@ -27,7 +30,7 @@ gameRouter.post(
   headerValidationMiddleware(isAuthenticSchema),
   schemaValidationMiddleware(hostGameSchema),
   jwtAuthorizationMiddleware,
-  apiForwardMiddleware()
+  apiForwardMiddleware(hostGameApi)
 );
 
 gameRouter.post(
@@ -35,15 +38,15 @@ gameRouter.post(
   headerValidationMiddleware(isAuthenticSchema),
   schemaValidationMiddleware(joinGameSchema),
   jwtAuthorizationMiddleware,
-  apiForwardMiddleware()
+  apiForwardMiddleware(joinGameApi)
 );
 
-userRouter.post(
+gameRouter.post(
   URLS.ROUTES.GAMES.DELETE_GAME,
   headerValidationMiddleware(isAuthenticSchema),
   schemaValidationMiddleware(deleteGameSchema),
   jwtAuthorizationMiddleware,
-  apiForwardMiddleware(registerUserApi)
+  apiForwardMiddleware(deleteGameApi)
 );
 
 module.exports = gameRouter;

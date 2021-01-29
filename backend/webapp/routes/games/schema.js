@@ -9,7 +9,7 @@ const hostGameSchema = Joi.object({
 });
 
 const joinGameSchema = Joi.object({
-  gameId: Joi.number.required(),
+  gameId: Joi.number().required(),
   username: Joi.string().required().min(1)
 });
 
