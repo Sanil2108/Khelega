@@ -1,7 +1,9 @@
 const assert = require("assert");
+const { expect } = require("chai");
 const chai = require("chai");
 const chaiHttp = require("chai-http");
 const { URLS } = require("../constants");
+const btoa = require('btoa');
 
 chai.use(chaiHttp);
 
@@ -100,7 +102,30 @@ describe("Users test", () => {
   });
 
   describe("Forgot Password", () => {
+    it('Should return 400 if no email is specified', async () => {
+      const response = await chai.request(URLS.BASE_URL).post(`${URLS.ROUTES.USERS.BASE_URL}${URLS.ROUTES.USERS.FORGOT_PASSWORD}`).send({});
+      assert.strictEqual(response.statusCode, 400, `Forgot Password did not give a 400 response code when trying to send a request without an email address.`);
+    });
 
+    it('Should return 404 if email is not found', async () => {
+      const response = await chai.request(URLS.BASE_URL).post(`${URLS.ROUTES.USERS.BASE_URL}${URLS.ROUTES.USERS.FORGOT_PASSWORD}`).send({
+        email: "test.account@gmail.com",
+      });
+      assert.strictEqual(response.statusCode, 404, `Forgot Password did not give a 404 response code when trying to send a request with an unregistered email address.`);
+    });
+    
+    it('Should return token if email is found', async () => {
+      await chai.request(URLS.BASE_URL).post(`${URLS.ROUTES.USERS.BASE_URL}${URLS.ROUTES.USERS.REGISTER}`).send({
+        username: "test.account",
+        password: "raymon11",
+        email: "test.account@gmail.com",
+      });
+      const response = await chai.request(URLS.BASE_URL).post(`${URLS.ROUTES.USERS.BASE_URL}${URLS.ROUTES.USERS.FORGOT_PASSWORD}`).send({
+        email: "test.account@gmail.com",
+      });
+      assert.strictEqual(response.statusCode, 200, `Forgot Password did not give a 200 response code.`);
+      expect(response.body, `Forgot Password did not return a token.`).to.have.property('token');
+    });
   });
 
   describe("Is Authentic", () => {
@@ -108,7 +133,40 @@ describe("Users test", () => {
   });
 
   describe("Change Password", () => {
+    it('Should return 400 if no password is specified', async () => {
+      await chai.request(URLS.BASE_URL).post(`${URLS.ROUTES.USERS.BASE_URL}${URLS.ROUTES.USERS.REGISTER}`).send({
+        username: "test.account-1",
+        password: "raymon11",
+        email: "test.account123@gmail.com",
+      });
+      const forgotPasswordResponse = await chai.request(URLS.BASE_URL).post(`${URLS.ROUTES.USERS.BASE_URL}${URLS.ROUTES.USERS.FORGOT_PASSWORD}`).send({
+        email: "test.account123@gmail.com",
+      });
+      const response = await chai.request(URLS.BASE_URL).post(`${URLS.ROUTES.USERS.BASE_URL}${URLS.ROUTES.USERS.CHANGE_PASSWORD}`).send({
+        token: forgotPasswordResponse.body.token
+      });
+      assert.strictEqual(response.statusCode, 400, `Change Password did not give a 400 response code when trying to send a request without a new password.`);
+    });
 
+    it('Should return 200 if correct token is sent and change the password', async () => {
+      await chai.request(URLS.BASE_URL).post(`${URLS.ROUTES.USERS.BASE_URL}${URLS.ROUTES.USERS.REGISTER}`).send({
+        username: "test.account-2",
+        password: "raymon11",
+        email: "test.account1234@gmail.com",
+      });
+      const forgotPasswordResponse = await chai.request(URLS.BASE_URL).post(`${URLS.ROUTES.USERS.BASE_URL}${URLS.ROUTES.USERS.FORGOT_PASSWORD}`).send({
+        email: "test.account1234@gmail.com",
+      });
+      const response = await chai.request(URLS.BASE_URL).post(`${URLS.ROUTES.USERS.BASE_URL}${URLS.ROUTES.USERS.CHANGE_PASSWORD}`).send({
+        token: forgotPasswordResponse.body.token,
+        password: 'root2'
+      });
+      assert.strictEqual(response.statusCode, 200, `Change Password did not give a 200 response code when trying to send a correct request.`);
+      const loginResponse = await chai.request(URLS.BASE_URL).post(`${URLS.ROUTES.USERS.BASE_URL}${URLS.ROUTES.USERS.LOGIN}`).set({
+        authorization: `Basic ${btoa(`test.account1234@gmail.com:root2`)}`
+      })
+      assert.strictEqual(loginResponse.statusCode, 200, `Change Password did not change the password.`);
+    });
   });
 
   describe("Follow", () => {
