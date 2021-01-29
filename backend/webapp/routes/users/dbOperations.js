@@ -34,14 +34,6 @@ const doesUsernameExist = async ({username}) => {
   }
 }
 
-const deleteOldTokensForUser = async ({user_id}) => {
-  const query = getDeleteForgotPasswordTokensForUserQuery();
-  await postgresDriver.query(query, [user_id]);
-  return {
-    successful: true,
-  };
-}
-
 const getUserIdFromEmail = async ({email}) => {
   const userIdQuery = getUserIdFromEmailQuery();
   const {rows} = await postgresDriver.query(userIdQuery, [email]);
@@ -59,14 +51,22 @@ const getUserIdFromEmail = async ({email}) => {
 }
 
 const addResetPasswordToken = async ({userId}) => {
-  const forgotPasswordQuery = getAddResetPasswordTokenQuery();
-
   const token = getRandomUUID();
 
-  const {rowCount} = await postgresDriver.query(forgotPasswordQuery, [userId, token]);
+  const deleteOldTokensForUserQuery = getDeleteForgotPasswordTokensForUserQuery();
+  const forgotPasswordQuery = getAddResetPasswordTokenQuery();
+
+  await postgresDriver.doInTransaction(async (client, rollback) => {
+    await client.query(deleteOldTokensForUserQuery, [userId]);
+
+    const {rowCount} = await client.query(forgotPasswordQuery, [userId, token]);
+    if (!rowCount) {
+      rollback();
+    }
+  });
 
   return {
-    successful: rowCount !== 0,
+    successful: true,
     data: {
       token
     }
@@ -88,11 +88,20 @@ const getUserIdFromForgotPasswordToken = async ({token}) => {
 
 const changePasswordWithUserId = async ({password, userId}) => {
   const changePasswordQuery = getChangePasswordWithUserIdQuery();
+  const deleteOldTokensForUserQuery = getDeleteForgotPasswordTokensForUserQuery();
 
-  const {rowCount} = await postgresDriver.query(changePasswordQuery, [password, userId]);
+  const {successful} = await postgresDriver.doInTransaction(async (client, rollback) => {
+    const {rowCount: changePasswordRowCount} = await client.query(changePasswordQuery, [password, userId]);
+    if (changePasswordRowCount < 1) {
+      rollback();
+      return;
+    }
+
+    await client.query(deleteOldTokensForUserQuery, [userId]);
+  });
 
   return {
-    successful: rowCount > 0
+    successful
   }
 }
 
@@ -113,7 +122,6 @@ const addUser = async ({username, email, hashedPassword, description = null}) =>
 
 module.exports = {
   addUser,
-  deleteOldTokensForUser,
   getUserIdFromEmail,
   addResetPasswordToken,
   doesEmailExist,

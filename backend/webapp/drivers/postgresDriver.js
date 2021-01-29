@@ -14,6 +14,23 @@ class PostgresDriver {
     await this.client.connect();
   }
 
+  async doInTransaction(callback) {
+    await this.client.query('BEGIN');
+
+    await callback(this.client, async () => {
+      await this.client.query('ROLLBACK');
+      return {
+        successful: false
+      };
+    });
+
+    await this.client.query('COMMIT');
+
+    return {
+      successful: true,
+    }
+  }
+
   async query(queryString, variables) {
     return await new Promise((resolve, reject) => {
       try {

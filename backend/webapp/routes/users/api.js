@@ -3,7 +3,6 @@ const postgresDriver = require("../../drivers/postgresDriver");
 const {
   hashPassword,
   signJWT,
-  verifyJWT
 } = require("../../utils/authenticationUtils");
 
 const {
@@ -14,7 +13,6 @@ const {
 const {
   addUser,
   getUserIdFromEmail,
-  deleteOldTokensForUser,
   addResetPasswordToken,
   doesUsernameExist,
   doesEmailExist,
@@ -86,12 +84,6 @@ const forgotPassword = async ({ body, headers }, res) => {
     return;
   }
   const {user_id: userId} = data;
-
-  const {successful: successfullyDeleteOldTokensForUser} = await deleteOldTokensForUser({userId});
-  if (!successfullyDeleteOldTokensForUser) {
-    res.status(500).send('Failed to delete old tokens for the user');
-    return;
-  }
   
   const {successful: successfullyAddedTokenForUser, data: resetPasswordTokenData} = await addResetPasswordToken({userId});
   if (!successfullyAddedTokenForUser) {
@@ -143,10 +135,8 @@ const changePassword = async({ body, headers }, res) => {
     return;
   }
 
-  const {successful} = await deleteOldTokensForUser({user_id: data.userId});
-
   return {
-    successful
+    successful: true
   }
 };
 
